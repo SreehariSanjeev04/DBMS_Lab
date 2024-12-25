@@ -7,7 +7,7 @@ BlockBuffer::BlockBuffer(int blockNum) {
     this->blockNum = blockNum;
 }
 
-RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) {}
+RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) {} /* Constructor Initializer*/
 
 int BlockBuffer::getHeader(struct HeadInfo* head) {
     unsigned char buffer[BLOCK_SIZE];
@@ -24,6 +24,9 @@ int BlockBuffer::getHeader(struct HeadInfo* head) {
     return SUCCESS;
 }
 
+/*
+    Need Review
+*/
 int RecBuffer::getRecord(union Attribute *rec, int slotNum) {
     HeadInfo head;
 
@@ -41,5 +44,24 @@ int RecBuffer::getRecord(union Attribute *rec, int slotNum) {
     unsigned char *start = buffer + recordStart;
 
     memcpy(rec, start, recordSize);
+    return SUCCESS;
+}
+
+int RecBuffer::setRecord(union Attribute *rec, int slotNum) {
+    HeadInfo head;
+    
+    BlockBuffer::getHeader(&head);
+
+    int attrCount = head.numAttrs;
+    int slotCount = head.numSlots;
+    unsigned char buffer[BLOCK_SIZE];
+
+    int recordSize = ATTR_SIZE * attrCount;
+    int recordStart = HEADER_SIZE + slotCount + slotNum * recordSize;
+    unsigned char *start = buffer + recordStart;
+
+    memcpy(start, rec, recordSize);
+    Disk::writeBlock(buffer, this->blockNum);
+    
     return SUCCESS;
 }
