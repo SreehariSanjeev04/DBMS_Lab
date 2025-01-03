@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 BlockBuffer::BlockBuffer(int blockNum) {
     this->blockNum = blockNum;
@@ -9,9 +10,31 @@ BlockBuffer::BlockBuffer(int blockNum) {
 
 RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) {} /* Constructor Initializer*/
 
-int BlockBuffer::getHeader(struct HeadInfo* head) {
-    unsigned char buffer[BLOCK_SIZE];
+int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr) {
+    int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
 
+    if(bufferNum == E_BLOCKNOTINBUFFER) {
+        bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
+
+        if(bufferNum == E_OUTOFBOUND) {
+            return E_OUTOFBOUND;
+        }
+
+        Disk::readBlock(StaticBuffer::blocks[bufferNum], this->blockNum);
+    }
+
+    *bufferPtr = StaticBuffer::blocks[bufferNum];
+
+    return SUCCESS;
+}
+int BlockBuffer::getHeader(struct HeadInfo* head) {
+    unsigned char *bufferPtr;
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if(ret != SUCCESS) {
+        return ret;
+    }
+
+    unsigned char buffer[BLOCK_SIZE];
     Disk::readBlock(buffer, this->blockNum);
 
     memcpy(&head->numSlots, buffer+24, 4);
@@ -28,6 +51,12 @@ int BlockBuffer::getHeader(struct HeadInfo* head) {
     Need Review
 */
 int RecBuffer::getRecord(union Attribute *rec, int slotNum) {
+
+    unsigned char* bufferPtr;
+    int ret = BlockBuffer::loadBlockAndGetBufferPtr(&bufferPtr);
+    if(ret != SUCCESS) {
+        return ret;
+    }
     HeadInfo head;
 
     BlockBuffer::getHeader(&head);
@@ -48,13 +77,21 @@ int RecBuffer::getRecord(union Attribute *rec, int slotNum) {
 }
 
 int RecBuffer::setRecord(union Attribute *rec, int slotNum) {
+
+    unsigned char *bufferPtr;
+
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if(ret!= SUCCESS) {
+        return ret;
+    }
     HeadInfo head;
     
     BlockBuffer::getHeader(&head);
 
+    unsigned char buffer[BLOCK_SIZE];
+
     int attrCount = head.numAttrs;
     int slotCount = head.numSlots;
-    unsigned char buffer[BLOCK_SIZE];
 
     int recordSize = ATTR_SIZE * attrCount;
     int recordStart = HEADER_SIZE + slotCount + slotNum * recordSize;
@@ -65,3 +102,5 @@ int RecBuffer::setRecord(union Attribute *rec, int slotNum) {
     
     return SUCCESS;
 }
+
+
