@@ -120,7 +120,7 @@ void updateAttributeName (const char* relName,
 int main(int argc, char *argv[])
 {
 	Disk disk_run;
-  StaticBuffer buffer;
+  	StaticBuffer buffer;
 	printRelations();
 	// updateAttributeName ("Students", "Class", "Batch");
 	// printAttributeCatalog();
