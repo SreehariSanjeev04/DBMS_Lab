@@ -42,7 +42,7 @@ void printRelations() {
 
 void printRelationCache() {	
 	RelCatEntry relCatEntry;
-	for(int i = RELCAT_RELID; i <= ATTRCAT_RELID; i++) {
+	for(int i = RELCAT_RELID; i <= 3; i++) {
 		if(RelCacheTable::getRelCatEntry(i, &relCatEntry) != SUCCESS) {
 			printf("Relation Catalogue Not Found.\n");
 		}
