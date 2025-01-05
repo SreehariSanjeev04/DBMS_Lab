@@ -39,6 +39,27 @@ void printRelations() {
   }
   printf("\n");
 }
+
+void printRelationCache() {	
+	RelCatEntry relCatEntry;
+	for(int i = RELCAT_RELID; i <= ATTRCAT_RELID; i++) {
+		if(RelCacheTable::getRelCatEntry(i, &relCatEntry) != SUCCESS) {
+			printf("Relation Catalogue Not Found.\n");
+		}
+		printf("Relation: %s\n", relCatEntry.relName);
+		for(int j = 0; j < relCatEntry.numAttrs; j++) {
+			AttrCatEntry attrCatEntry;
+			const int response = AttrCacheTable::getAttrCatEntry(i,j,&attrCatEntry);
+			if(response != SUCCESS) {
+				printf("Failed to fetch entries.\n");
+			}
+			const char* attrType = attrCatEntry.attrType == NUMBER ? "NUM" : "STR";
+			printf(" %s %s\n", attrCatEntry.attrName, attrType);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}
 void printSchema () {
 	RecBuffer relCatBuffer(RELCAT_BLOCK);
 	RecBuffer attrCatBuffer(ATTRCAT_BLOCK);
@@ -121,7 +142,8 @@ int main(int argc, char *argv[])
 {
 	Disk disk_run;
   	StaticBuffer buffer;
-	printRelations();
+	OpenRelTable cache;
+	printRelationCache();
 	// updateAttributeName ("Students", "Class", "Batch");
 	// printAttributeCatalog();
 

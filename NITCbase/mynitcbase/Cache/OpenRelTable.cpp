@@ -2,6 +2,7 @@
 
 #include <cstring>
 #include <stdlib.h>
+#include <iostream>
 
 OpenRelTable::OpenRelTable() {
     /*
@@ -19,10 +20,10 @@ OpenRelTable::OpenRelTable() {
     }
 
     // populating through relation catalog for the relation cache
-
+    
     RecBuffer relCatBuffer(RELCAT_BLOCK);
+    // Attribute relCatRecord[RELCAT_NO_ATTRS];
     Attribute relCatRecord[RELCAT_NO_ATTRS];
-
     relCatBuffer.getRecord(relCatRecord, RELCAT_SLOTNUM_FOR_RELCAT);
 
     RelCacheEntry relCacheEntry;
@@ -51,10 +52,14 @@ OpenRelTable::OpenRelTable() {
     AttrCacheEntry* attrCacheEntry = nullptr;
     AttrCacheEntry* head = nullptr;
     AttrCacheEntry* prev = nullptr;
-    AttrCacheEntry* attrHead = nullptr; 
+
+    /*
+        For relation catalogue attributes
+    */
     for(int i = 0; i < RELCAT_NO_ATTRS; i++) {
         attrCatBuffer.getRecord(attrCatRecord, i);
         attrCacheEntry = (AttrCacheEntry*)malloc(sizeof(AttrCacheEntry));
+        AttrCacheTable::recordToAttrCatEntry(attrCatRecord, &(attrCacheEntry->attrCatEntry));
         if(!head) {
             head = attrCacheEntry;
             prev = attrCacheEntry;
@@ -65,13 +70,18 @@ OpenRelTable::OpenRelTable() {
     attrCacheEntry->next = nullptr;
 
     AttrCacheTable::attrCache[RELCAT_RELID] = head;
-    // head -> node 1 -> node 2 -> nullptr
 
-    // Setting up Attribute Catalog relation in the Attribute Cache Table
+    /* Simply printing the linked list for debugging*/
+
+    // Setting up Attribute Catalog relation in the Attribute Cache Table // 
+
+    prev = nullptr;
+    head = nullptr;
     for(int i = 6; i < ATTRCAT_NO_ATTRS + 6; i++) {
         attrCatBuffer.getRecord(attrCatRecord, i);
         attrCacheEntry = (AttrCacheEntry*)malloc(sizeof(AttrCacheEntry));
-        if(!attrHead) {
+        AttrCacheTable::recordToAttrCatEntry(attrCatRecord, &(attrCacheEntry->attrCatEntry));
+        if(!head) {
             prev = attrCacheEntry;
             head = attrCacheEntry;
         }
@@ -80,8 +90,7 @@ OpenRelTable::OpenRelTable() {
     }
 
     attrCacheEntry->next = nullptr;
-    AttrCacheTable::attrCache[ATTRCAT_RELID] = attrHead;
-
+    AttrCacheTable::attrCache[ATTRCAT_RELID] = head;
 }
 void freeLinkedList(AttrCacheEntry** head) {
     if (!head || !*head) return;  
