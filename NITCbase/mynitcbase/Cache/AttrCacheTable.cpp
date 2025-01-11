@@ -30,8 +30,7 @@ int AttrCacheTable::getAttrCatEntry(int relId, char attrName[ATTR_SIZE], AttrCat
     if(attrCache[relId] == nullptr) {
         return E_RELNOTOPEN;
     }
-    for(int i = 0; i < MAX_OPEN; i++) {
-        AttrCacheEntry* ptr = attrCache[i];
+        AttrCacheEntry* ptr = attrCache[relId];
         while(ptr) {
             if(strcmp(ptr->attrCatEntry.attrName, attrName) == 0) {
                 *(attrCatEntry) = ptr->attrCatEntry;
@@ -39,7 +38,6 @@ int AttrCacheTable::getAttrCatEntry(int relId, char attrName[ATTR_SIZE], AttrCat
             }
             ptr = ptr->next;
         }
-    }
     return E_ATTRNOTEXIST;
 }
 
