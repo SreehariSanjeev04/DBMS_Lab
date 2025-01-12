@@ -81,18 +81,24 @@ OpenRelTable::OpenRelTable() {
         prev = nullptr;
    }
 
-   tableMetaInfo[RELCAT_RELID].free = false;
-  tableMetaInfo[ATTRCAT_RELID].free = false;
-  strcpy(tableMetaInfo[RELCAT_RELID].relName, "RELATIONCAT");
-  strcpy(tableMetaInfo[ATTRCAT_RELID].relName, "ATTRIBUTECAT");
+    tableMetaInfo[RELCAT_RELID].free = false;
+    tableMetaInfo[ATTRCAT_RELID].free = false;
+    strcpy(tableMetaInfo[RELCAT_RELID].relName, "RELATIONCAT");
+    strcpy(tableMetaInfo[ATTRCAT_RELID].relName, "ATTRIBUTECAT");
 }
 
 OpenRelTable::~OpenRelTable() {
     for(int i = 2; i < MAX_OPEN; i++) {
-        if(!tableMetaInfo[i].free) {
+        if(tableMetaInfo[i].free == false) {
             closeRel(i);
         }
     }
+    // free the cache for rel id 0 and 1
+    free(RelCacheTable::relCache[0]);
+    free(RelCacheTable::relCache[1]);
+
+    freeLinkedList(&AttrCacheTable::attrCache[0]);
+    freeLinkedList(&AttrCacheTable::attrCache[1]);
 }
 
 int OpenRelTable::getRelId(char relName[ATTR_SIZE]) {
@@ -175,6 +181,7 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
         }
         prev = attrCacheEntry;
     }
+    prev->next = nullptr;
     AttrCacheTable::attrCache[relId] = head;
 
     //update the metainfoa
@@ -201,7 +208,6 @@ int OpenRelTable::closeRel(int relId) {
     // releasing the relation cache entry of the relation
     free(RelCacheTable::relCache[relId]);
     freeLinkedList(&AttrCacheTable::attrCache[relId]);
-    RelCacheTable::relCache[relId] = nullptr;
 
     //update the metainfo
 
