@@ -133,6 +133,7 @@ int RecBuffer::setRecord(union Attribute *rec, int slotNum)
     return SUCCESS;
 }
 
+
 int compareAttrs(union Attribute attr1, union Attribute attr2, int attrType) {
     double diff;
     if(attrType == STRING) {

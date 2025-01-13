@@ -9,10 +9,19 @@ StaticBuffer::StaticBuffer() {
     // Initialize buffer with default values
     for(int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
         metainfo[bufferIndex].free = true;
+        metainfo[bufferIndex].dirty = false;
+        metainfo[bufferIndex].timeStamp = -1;
+        metainfo[bufferIndex].blockNum = -1;
     }
 }
 
-StaticBuffer::~StaticBuffer() {}
+StaticBuffer::~StaticBuffer() {
+    for(int i = 0; i < BUFFER_CAPACITY; i++) {
+        if(!metainfo[i].free && metainfo[i].dirty) {
+            Disk::writeBlock(blocks[i], metainfo[i].blockNum);
+        }
+    }
+}
 
 int StaticBuffer::getFreeBuffer(int blockNum) {
     if(blockNum < 0 || blockNum > DISK_BLOCKS) {
