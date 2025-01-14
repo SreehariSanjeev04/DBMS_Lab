@@ -55,7 +55,7 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
         (op == LE && cmpVal <= 0) ||
         (op == EQ && cmpVal == 0) ||
         (op == GT && cmpVal > 0) ||
-        (op == GE && cmpVal) > 0) {
+        (op == GE && cmpVal >= 0 )) {
             RecId newSearchIndex;
             newSearchIndex.block = block;
             newSearchIndex.slot = slot;

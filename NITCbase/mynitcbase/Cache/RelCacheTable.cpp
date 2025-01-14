@@ -65,3 +65,4 @@ int RelCacheTable::resetSearchIndex(int recId) {
     RelCacheTable::relCache[recId]->searchIndex = {-1, -1};
     return SUCCESS;
 }
+
