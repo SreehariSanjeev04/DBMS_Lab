@@ -67,14 +67,14 @@ RecId BlockAccess::linearSearch(int relId, char attrName[ATTR_SIZE], union Attri
     return RecId{-1,-1};
 }
 
-int BlockAccess::renameRelation(char* oldRelName, char * newRelName) {
-    int relId = OpenRelTable::getRelId(RELCAT_RELID);
-    RelCacheTable::resetSearchIndex(relId);
+int BlockAccess::renameRelation(char* oldRelName, char *newRelName) {
+    
+    RelCacheTable::resetSearchIndex(RELCAT_RELID);
 
     Attribute newRelationName;
-    strcpy(newRelationName.sVal, oldRelName);
+    strcpy(newRelationName.sVal, newRelName);
     
-    RecId searchIndex = linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, newRelationName, EQ);
+    RecId searchIndex = linearSearch(RELCAT_RELID, (char*)RELCAT_ATTR_RELNAME, newRelationName, EQ);
     if(searchIndex.block != -1 && searchIndex.slot != -1) {
         return E_RELEXIST;
     }
@@ -84,7 +84,7 @@ int BlockAccess::renameRelation(char* oldRelName, char * newRelName) {
     Attribute oldRelationName;
     strcpy(oldRelationName.sVal, oldRelName);
 
-    searchIndex = linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, oldRelationName, EQ);
+    searchIndex = linearSearch(RELCAT_RELID, (char*)RELCAT_ATTR_RELNAME, oldRelationName, EQ);
     if(searchIndex.block == -1 && searchIndex.slot == -1) {
         return E_RELNOTEXIST;
     }
@@ -99,7 +99,7 @@ int BlockAccess::renameRelation(char* oldRelName, char * newRelName) {
     RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
 
     for(int i = 0; i < record[RELCAT_NO_ATTRIBUTES_INDEX].nVal; i++) {
-        searchIndex = linearSearch(ATTRCAT_RELID, ATTRCAT_ATTR_RELNAME, oldRelationName, EQ);
+        searchIndex = linearSearch(ATTRCAT_RELID, (char*)ATTRCAT_ATTR_RELNAME, oldRelationName, EQ);
 
         RecBuffer attrBlock(searchIndex.block);
         Attribute attrRecord[ATTRCAT_NO_ATTRS];
@@ -107,7 +107,6 @@ int BlockAccess::renameRelation(char* oldRelName, char * newRelName) {
         strcpy(attrRecord[ATTRCAT_REL_NAME_INDEX].sVal, newRelName);
         attrBlock.setRecord(attrRecord, searchIndex.slot);
     }
-
     return SUCCESS;
 }
 
@@ -116,17 +115,18 @@ int BlockAccess::renameAttribute(char relName[ATTR_SIZE], char oldName[ATTR_SIZE
 
     Attribute relNameAttr;
     strcpy(relNameAttr.sVal, relName);
-    RecId searchIndex = linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, relNameAttr, EQ);
+    RecId searchIndex = linearSearch(RELCAT_RELID, (char*)RELCAT_ATTR_RELNAME, relNameAttr, EQ);
     if(searchIndex.block == -1 && searchIndex.slot == -1) {
         return E_RELNOTEXIST;
     }
     RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
 
+    
     RecId attrToRenameRecId = {-1,-1};
     Attribute attrCatEntryRecord[ATTRCAT_NO_ATTRS];
 
     while(true) {
-        searchIndex = BlockAccess::linearSearch(ATTRCAT_RELID, ATTRCAT_ATTR_RELNAME, relNameAttr, EQ);
+        searchIndex = BlockAccess::linearSearch(ATTRCAT_RELID, (char*)ATTRCAT_ATTR_RELNAME, relNameAttr, EQ);
         if(searchIndex.block == -1 && searchIndex.slot == -1) {
             break;
         }

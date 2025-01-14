@@ -27,20 +27,33 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
     if(blockNum < 0 || blockNum > DISK_BLOCKS) {
         return E_OUTOFBOUND;
     }
-    int allocatedBuffer;
-
+    int allocatedBuffer = -1;
+    int timeStamp = -1;
+    int index = -1;
     for(int bufferIndex = 0; bufferIndex < BUFFER_CAPACITY; bufferIndex++) {
+        if(metainfo[bufferIndex].timeStamp > timeStamp) {
+            timeStamp = metainfo[bufferIndex].timeStamp;
+            index = bufferIndex;
+        }
         if(metainfo[bufferIndex].free == true) {
             allocatedBuffer = bufferIndex;
             break;
         }
     }
+    // write back functionality 
+    if(allocatedBuffer==-1 && metainfo[index].dirty) {
+        Disk::writeBlock(blocks[index], metainfo[index].blockNum);
+        allocatedBuffer = index;
+    }
     metainfo[allocatedBuffer].free = false;
     metainfo[allocatedBuffer].blockNum = blockNum;
+    metainfo[allocatedBuffer].dirty = false;
+    metainfo[allocatedBuffer].timeStamp = 0;
     return allocatedBuffer;
 }
 
 int StaticBuffer::getBufferNum(int blockNum) {
+    // implementing LRU Algorithm
     if(blockNum < 0 || blockNum > DISK_BLOCKS) {
         return E_OUTOFBOUND;
     }
@@ -50,4 +63,18 @@ int StaticBuffer::getBufferNum(int blockNum) {
         }
     }
     return E_BLOCKNOTINBUFFER;
+}
+
+int StaticBuffer::setDirtyBit(int blockNum) {
+    int bufferNum = getBufferNum(blockNum);
+    if(bufferNum == E_BLOCKNOTINBUFFER) {
+        return E_BLOCKNOTINBUFFER;
+    }
+    if(bufferNum == E_OUTOFBOUND) {
+        return E_OUTOFBOUND;
+    }
+    else {
+        metainfo[bufferNum].dirty = true;
+    }
+    return SUCCESS;
 }

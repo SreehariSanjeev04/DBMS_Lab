@@ -36,6 +36,7 @@ int RecBuffer::getSlotMap(unsigned char *slotMap)
 
 int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
 {
+    
     int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
 
     if (bufferNum == E_BLOCKNOTINBUFFER)
@@ -46,7 +47,10 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
         {
             return E_OUTOFBOUND;
         }
-
+        for(int i = 0; i < MAX_OPEN; i++) {
+           StaticBuffer::metainfo[i].timeStamp = 0;
+        }
+        StaticBuffer::metainfo[bufferNum].timeStamp += 1;
         Disk::readBlock(StaticBuffer::blocks[bufferNum], this->blockNum);
     }
 
@@ -92,8 +96,6 @@ int RecBuffer::getRecord(union Attribute *rec, int slotNum)
     int attrCount = head.numAttrs;
     int slotCount = head.numSlots;
 
-    // unsigned char buffer[BLOCK_SIZE];
-    // Disk::readBlock(buffer, this->blockNum);
 
     int recordStart = HEADER_SIZE + slotCount + slotNum * (ATTR_SIZE * attrCount);
     int recordSize = ATTR_SIZE * attrCount;
@@ -128,7 +130,10 @@ int RecBuffer::setRecord(union Attribute *rec, int slotNum)
     unsigned char *start = bufferPtr + recordStart;
 
     memcpy(start, rec, recordSize);
-    Disk::writeBlock(bufferPtr, this->blockNum);
+
+    if(StaticBuffer::setDirtyBit(this->blockNum) != SUCCESS) {
+        printf("Setting Dirty Failed.\n");
+    }
 
     return SUCCESS;
 }

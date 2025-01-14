@@ -163,6 +163,7 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
     AttrCacheEntry* prev = nullptr;
     AttrCacheEntry* head = nullptr;
 
+    RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
     int numberOfAttributes = RelCacheTable::relCache[relId]->relCatEntry.numAttrs;
 
     for(int i = 0; i < numberOfAttributes; i++) {
