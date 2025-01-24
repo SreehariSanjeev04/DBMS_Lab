@@ -206,6 +206,18 @@ int OpenRelTable::closeRel(int relId) {
         return E_RELNOTOPEN;
     }
 
+    // Releasing the relation cache entry of the relation   
+    
+    if(RelCacheTable::relCache[relId]->dirty) {
+        Attribute record[RELCAT_NO_ATTRS];
+        RelCacheTable::relCatEntryToRecord(&(RelCacheTable::relCache[relId]->relCatEntry), record);
+        
+        RecId recData = RelCacheTable::relCache[relId]->recId;
+        RecBuffer relCatBuffer(recData.block);
+        relCatBuffer.setRecord(record, recData.slot);
+
+    }
+
     // releasing the relation cache entry of the relation
     free(RelCacheTable::relCache[relId]);
     freeLinkedList(&AttrCacheTable::attrCache[relId]);

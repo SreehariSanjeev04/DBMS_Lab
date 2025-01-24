@@ -41,6 +41,20 @@ RelCatEntry* relCatEntry) {
     relCatEntry->numSlotsPerBlk = (int)record[RELCAT_NO_SLOTS_PER_BLOCK_INDEX].nVal;
 }
 
+int RelCacheTable::setRelCatEntry(int relId, RelCatEntry* relCatBuf) {
+    if(relId < 0 || relId >= MAX_OPEN) {
+        return E_OUTOFBOUND;
+    }
+    if(relCache[relId] == nullptr) {
+        return E_RELNOTOPEN;
+    }
+    // deep copy instead of shallow copy
+    memcpy(&(RelCacheTable::relCache[relId]->relCatEntry), relCatBuf, sizeof(RelCatEntry));
+    RelCacheTable::relCache[relId]->dirty = true;
+    return SUCCESS;
+
+}
+
 int RelCacheTable::setSearchIndex(int recId, RecId* searchIndex) {
     if(recId < 0 || recId > MAX_OPEN) {
         return E_OUTOFBOUND;
@@ -64,4 +78,13 @@ int RelCacheTable::resetSearchIndex(int recId) {
 
     RelCacheTable::relCache[recId]->searchIndex = {-1, -1};
     return SUCCESS;
+}
+
+void RelCacheTable::relCatEntryToRecord(RelCatEntry* relCatEntry, Attribute *record) {
+    strcpy(record[RELCAT_REL_NAME_INDEX].sVal, relCatEntry->relName);
+    record[RELCAT_NO_ATTRIBUTES_INDEX].nVal = (int)relCatEntry->numAttrs;
+    record[RELCAT_NO_RECORDS_INDEX].nVal = (int)relCatEntry->numRecs;
+    record[RELCAT_FIRST_BLOCK_INDEX].nVal = (int)relCatEntry->firstBlk;
+    record[RELCAT_LAST_BLOCK_INDEX].nVal = (int)relCatEntry->lastBlk;
+    record[RELCAT_NO_SLOTS_PER_BLOCK_INDEX].nVal = (int)relCatEntry->numSlotsPerBlk;
 }
