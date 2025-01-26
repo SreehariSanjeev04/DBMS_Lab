@@ -93,6 +93,26 @@ OpenRelTable::~OpenRelTable() {
             closeRel(i);
         }
     }
+
+    if(RelCacheTable::relCache[ATTRCAT_RELID]->dirty) {
+        RelCatEntry relCatEntry;
+        RelCacheTable::getRelCatEntry(ATTRCAT_RELID, &relCatEntry);
+        Attribute record[RELCAT_NO_ATTRS];
+        RelCacheTable::relCatEntryToRecord(&relCatEntry, record);
+        RecId recId = RelCacheTable::relCache[ATTRCAT_RELID]->recId;
+        RecBuffer relCatBlock(recId.block);
+        relCatBlock.setRecord(record, recId.slot);
+    }
+
+    if(RelCacheTable::relCache[RELCAT_RELID]->dirty) {
+        RelCatEntry relCatBuffer;
+        RelCacheTable::getRelCatEntry(RELCAT_RELID, &relCatBuffer);
+        Attribute record[ATTRCAT_NO_ATTRS];
+        RelCacheTable::relCatEntryToRecord(&relCatBuffer, record);
+        RecId recId = RelCacheTable::relCache[RELCAT_RELID]->recId;
+        RecBuffer attrCatRecord(recId.block);
+        attrCatRecord.setRecord(record, recId.slot);
+    }
     // free the cache for rel id 0 and 1
     free(RelCacheTable::relCache[0]);
     free(RelCacheTable::relCache[1]);
