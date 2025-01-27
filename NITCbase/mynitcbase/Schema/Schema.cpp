@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <iostream>
 
 int Schema::openRel(char relName[ATTR_SIZE]) {
     int ret = OpenRelTable::openRel(relName);
@@ -57,6 +58,7 @@ int Schema::renameAttr(char *relName, char *oldAttrName, char *newAttrName) {
 }
 
 int Schema::createRel(char relname[], int nAttrs, char attrs[][ATTR_SIZE], int attrType[]) {
+    printf("Hello.\n");
     Attribute relNameAsAttribute;
     strcpy(relNameAsAttribute.sVal, relname);
     
@@ -71,7 +73,8 @@ int Schema::createRel(char relname[], int nAttrs, char attrs[][ATTR_SIZE], int a
 
     // checking for duplicate attributes
     for(int i = 0; i < nAttrs; i++) {
-        for(int j = 0; j < nAttrs; j++) {
+        for(int j = i+1; j < nAttrs; j++) {
+            printf("%s %s\n", attrs[i], attrs[j]);
             if(strcmp(attrs[i], attrs[j]) == 0) return E_DUPLICATEATTR;
         }
     }
@@ -109,6 +112,7 @@ int Schema::createRel(char relname[], int nAttrs, char attrs[][ATTR_SIZE], int a
             return E_DISKFULL;
         }
     }
+    return SUCCESS;
 }
 
 int Schema::deleteRel(char* relName) {
