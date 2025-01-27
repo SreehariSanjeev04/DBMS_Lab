@@ -39,7 +39,15 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
     
     int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
 
-    if (bufferNum == E_BLOCKNOTINBUFFER)
+    // if block in already in buffer
+    if(bufferNum != E_BLOCKNOTINBUFFER) {
+        for(int i = 0; i < BUFFER_CAPACITY; i++) {
+            StaticBuffer::metainfo[i].timeStamp++;
+        }
+        StaticBuffer::metainfo[bufferNum].timeStamp = 0;
+    }
+
+    else
     {
         bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
 
@@ -47,10 +55,6 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
         {
             return E_OUTOFBOUND;
         }
-        for(int i = 0; i < MAX_OPEN; i++) {
-           StaticBuffer::metainfo[i].timeStamp = 0;
-        }
-        StaticBuffer::metainfo[bufferNum].timeStamp += 1;
         Disk::readBlock(StaticBuffer::blocks[bufferNum], this->blockNum);
     }
 
@@ -119,8 +123,6 @@ int RecBuffer::setRecord(union Attribute *rec, int slotNum)
     HeadInfo head;
 
     BlockBuffer::getHeader(&head);
-
-    unsigned char buffer[BLOCK_SIZE];
 
     int attrCount = head.numAttrs;
     int slotCount = head.numSlots;

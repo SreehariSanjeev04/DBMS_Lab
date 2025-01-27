@@ -27,6 +27,13 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
     if(blockNum < 0 || blockNum > DISK_BLOCKS) {
         return E_OUTOFBOUND;
     }
+    // increase the timeStamp in metainfo of all occupied buffers
+    
+    for(int idx = 0; idx < BUFFER_CAPACITY; idx++) {
+        if(metainfo[idx].free == false) {
+            metainfo[idx].timeStamp++;
+        }
+    }
     int allocatedBuffer = -1;
     int timeStamp = -1;
     int index = -1;
