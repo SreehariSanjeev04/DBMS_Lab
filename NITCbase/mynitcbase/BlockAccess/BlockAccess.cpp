@@ -315,8 +315,6 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
 	
 	int firstBlock = relCatEntryRecord[RELCAT_FIRST_BLOCK_INDEX].nVal;
 	int numAttributes = relCatEntryRecord[RELCAT_NO_ATTRIBUTES_INDEX].nVal;
-
-    // TODO: Delete all the record blocks of the relation
 	int currentBlockNum = firstBlock;
   
 	while (currentBlockNum != -1) {
@@ -333,7 +331,6 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
 
  
 
-    // reset the searchIndex of the attribute catalog
 	RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
 
     int numberOfAttributesDeleted = 0;
@@ -366,9 +363,6 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
 		attrCatHeader.numEntries--;
 		attrCatBlockBuffer.setHeader(&attrCatHeader);
 
-        /* If number of entries become 0, releaseBlock is called after fixing
-           the linked list.
-        */
         if (attrCatHeader.numEntries == 0) {
 
 			RecBuffer prevBlock (attrCatHeader.lblock);

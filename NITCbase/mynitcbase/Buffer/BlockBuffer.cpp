@@ -21,12 +21,12 @@ BlockBuffer::BlockBuffer(char blockType) {
 }
 
 void BlockBuffer::releaseBlock() {
-  if (blockNum == INVALID_BLOCKNUM or
+  if (blockNum == INVALID_BLOCKNUM ||
       StaticBuffer::blockAllocMap[blockNum] == UNUSED_BLK) {
         return;
   }
   int bufferNum = StaticBuffer::getBufferNum(blockNum);
-  if (bufferNum >= 0 and bufferNum < BUFFER_CAPACITY) {
+  if (bufferNum >= 0 && bufferNum < BUFFER_CAPACITY) {
     StaticBuffer::metainfo[bufferNum].free = true;
   }
   StaticBuffer::blockAllocMap[blockNum] = UNUSED_BLK;
