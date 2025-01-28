@@ -270,6 +270,8 @@ int BlockAccess::insert(int relId, Attribute* record) {
     header.numEntries+=1;
     buffer.setHeader(&header);
     
+
+    // setting the relCatEntry numRecs
     relCatEntry.numRecs++;
     RelCacheTable::setRelCatEntry(relId, &relCatEntry);
 

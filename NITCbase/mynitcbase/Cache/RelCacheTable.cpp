@@ -50,7 +50,7 @@ int RelCacheTable::setRelCatEntry(int relId, RelCatEntry* relCatBuf) {
     }
     // deep copy instead of shallow copy
     memcpy(&(RelCacheTable::relCache[relId]->relCatEntry), relCatBuf, sizeof(RelCatEntry));
-    RelCacheTable::relCache[relId]->dirty = true;
+    RelCacheTable::relCache[relId]->dirty = true; // setting the dirty value to true for write back function
     return SUCCESS;
 
 }

@@ -73,7 +73,6 @@ int StaticBuffer::getFreeBuffer(int blockNum) {
     metainfo[allocatedBuffer].blockNum = blockNum;
     metainfo[allocatedBuffer].dirty = false;
     metainfo[allocatedBuffer].timeStamp = 0;
-    printf("allocated buffer -> %d\n", allocatedBuffer);
     return allocatedBuffer;
 }
 

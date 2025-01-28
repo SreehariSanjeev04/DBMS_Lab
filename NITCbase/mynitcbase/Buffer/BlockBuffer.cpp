@@ -11,7 +11,6 @@ BlockBuffer::BlockBuffer(int blockNum)
 BlockBuffer::BlockBuffer(char blockType) {
     int block_type = blockType == 'R' ? REC : UNUSED_BLK;
     int blockNum = getFreeBlock(block_type);
-    printf("%d\n", blockNum);
     if(blockNum < 0 || blockNum >= DISK_BLOCKS) {
         printf("Block is not available.\n");
         this->blockNum = blockNum;
