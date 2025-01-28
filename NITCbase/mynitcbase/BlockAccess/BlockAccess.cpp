@@ -273,6 +273,7 @@ int BlockAccess::insert(int relId, Attribute* record) {
     }
 
     unsigned char* slotMap = (unsigned char*)malloc(sizeof(unsigned char) * relCatEntry.numSlotsPerBlk);
+    buffer.getSlotMap(slotMap);
     slotMap[rec_id.slot] = SLOT_OCCUPIED;
 
     buffer.setSlotMap(slotMap);
@@ -299,7 +300,7 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
     RelCacheTable::resetSearchIndex(RELCAT_RELID);
     Attribute relNameAttr;
     strcpy(relNameAttr.sVal, relName);
-    RecId search = linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, relNameAttr, EQ);
+    RecId search = linearSearch(RELCAT_RELID, (char*)RELCAT_ATTR_RELNAME, relNameAttr, EQ);
     if(search.block == -1 && search.slot == -1) {
         return E_RELNOTEXIST;
     }
@@ -327,7 +328,7 @@ int BlockAccess::deleteRelation(char relName[ATTR_SIZE]) {
     RelCacheTable::resetSearchIndex(ATTRCAT_RELID);
     int numberOfAttributeDeleted = 0;
     while(true) {
-        RecId attrCatRecId = linearSearch(ATTRCAT_RELID, ATTRCAT_ATTR_RELNAME, relNameAttr, EQ);
+        RecId attrCatRecId = linearSearch(ATTRCAT_RELID, (char*)ATTRCAT_ATTR_RELNAME, relNameAttr, EQ);
         if(attrCatRecId.block == -1 && attrCatRecId.slot == -1) {
             break;
         }
