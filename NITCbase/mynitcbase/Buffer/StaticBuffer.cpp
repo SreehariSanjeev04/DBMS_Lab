@@ -36,6 +36,7 @@ StaticBuffer::~StaticBuffer() {
     }
 }
 
+
 int StaticBuffer::getFreeBuffer(int blockNum) {
     if(blockNum < 0 || blockNum > DISK_BLOCKS) {
         return E_OUTOFBOUND;

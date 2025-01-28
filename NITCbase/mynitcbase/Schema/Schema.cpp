@@ -58,14 +58,13 @@ int Schema::renameAttr(char *relName, char *oldAttrName, char *newAttrName) {
 }
 
 int Schema::createRel(char relname[], int nAttrs, char attrs[][ATTR_SIZE], int attrType[]) {
-    printf("Hello.\n");
     Attribute relNameAsAttribute;
     strcpy(relNameAsAttribute.sVal, relname);
     
     RecId targetRelId = {-1,-1};
     int relId = OpenRelTable::getRelId(relname);
     RelCacheTable::resetSearchIndex(relId);
-    targetRelId = BlockAccess::linearSearch(RELCAT_RELID, RELCAT_ATTR_RELNAME, relNameAsAttribute, EQ);
+    targetRelId = BlockAccess::linearSearch(RELCAT_RELID, (char*)RELCAT_ATTR_RELNAME, relNameAsAttribute, EQ);
 
     if(targetRelId.block != -1 && targetRelId.slot != -1) {
         return E_RELEXIST;
@@ -74,7 +73,6 @@ int Schema::createRel(char relname[], int nAttrs, char attrs[][ATTR_SIZE], int a
     // checking for duplicate attributes
     for(int i = 0; i < nAttrs; i++) {
         for(int j = i+1; j < nAttrs; j++) {
-            printf("%s %s\n", attrs[i], attrs[j]);
             if(strcmp(attrs[i], attrs[j]) == 0) return E_DUPLICATEATTR;
         }
     }

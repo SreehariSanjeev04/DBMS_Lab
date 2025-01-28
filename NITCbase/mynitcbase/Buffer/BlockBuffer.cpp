@@ -21,17 +21,16 @@ BlockBuffer::BlockBuffer(char blockType) {
 }
 
 void BlockBuffer::releaseBlock() {
-    if(this->blockNum == INVALID_BLOCKNUM || StaticBuffer::blockAllocMap[blockNum] == UNUSED_BLK) {
-        printf("Block is unused.\n");
+  if (blockNum == INVALID_BLOCKNUM or
+      StaticBuffer::blockAllocMap[blockNum] == UNUSED_BLK) {
         return;
-    } else {
-        int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
-        if(bufferNum >= 0 && bufferNum < BUFFER_CAPACITY) {
-            StaticBuffer::metainfo[bufferNum].free = true;
-        }
-        StaticBuffer::blockAllocMap[blockNum] = UNUSED_BLK;
-        this->blockNum = INVALID_BLOCKNUM;
-    }
+  }
+  int bufferNum = StaticBuffer::getBufferNum(blockNum);
+  if (bufferNum >= 0 and bufferNum < BUFFER_CAPACITY) {
+    StaticBuffer::metainfo[bufferNum].free = true;
+  }
+  StaticBuffer::blockAllocMap[blockNum] = UNUSED_BLK;
+  this->blockNum = INVALID_BLOCKNUM;
 }
 
 RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) {}

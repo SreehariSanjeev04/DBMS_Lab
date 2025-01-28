@@ -1,4 +1,3 @@
-echo
 echo ----Creating four new relations----
 CREATE TABLE Products(id NUM, name STR, cost NUM, stock NUM, color STR)
 CREATE TABLE Sales(id NUM, storeId NUM, productId NUM, purchaser STR, discount NUM, billId NUM)

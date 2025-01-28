@@ -176,7 +176,6 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
 
     relCacheEntry->recId = searchIndex;
     RelCacheTable::relCache[relId] = relCacheEntry;
-
     // loading the attributes to the attribute cache
 
     Attribute attrRecord[ATTRCAT_NO_ATTRS];
@@ -188,7 +187,6 @@ int OpenRelTable::openRel(char relName[ATTR_SIZE]) {
 
     for(int i = 0; i < numberOfAttributes; i++) {
         RecId attributeSearchIndex = BlockAccess::linearSearch(ATTRCAT_RELID, (char*)RELCAT_ATTR_RELNAME, attrVal, EQ);
-
         RecBuffer attrCatBlock = RecBuffer(attributeSearchIndex.block);
         attrCatBlock.getRecord(attrRecord, attributeSearchIndex.slot);
         AttrCacheEntry* attrCacheEntry = (AttrCacheEntry*)malloc(sizeof(AttrCacheEntry));
