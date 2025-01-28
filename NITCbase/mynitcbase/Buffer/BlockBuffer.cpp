@@ -11,6 +11,7 @@ BlockBuffer::BlockBuffer(int blockNum)
 BlockBuffer::BlockBuffer(char blockType) {
     int block_type = blockType == 'R' ? REC : UNUSED_BLK;
     int blockNum = getFreeBlock(block_type);
+    printf("%d\n", blockNum);
     if(blockNum < 0 || blockNum >= DISK_BLOCKS) {
         printf("Block is not available.\n");
         this->blockNum = blockNum;
@@ -141,7 +142,15 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
     
     int bufferNum = StaticBuffer::getBufferNum(this->blockNum);
 
-    if (bufferNum == E_BLOCKNOTINBUFFER)
+    // if block in already in buffer
+    if(bufferNum != E_BLOCKNOTINBUFFER) {
+        for(int i = 0; i < BUFFER_CAPACITY; i++) {
+            StaticBuffer::metainfo[i].timeStamp++;
+        }
+        StaticBuffer::metainfo[bufferNum].timeStamp = 0;
+    }
+
+    else
     {
         bufferNum = StaticBuffer::getFreeBuffer(this->blockNum);
 
@@ -149,10 +158,6 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
         {
             return E_OUTOFBOUND;
         }
-        for(int i = 0; i < MAX_OPEN; i++) {
-           StaticBuffer::metainfo[i].timeStamp = 0;
-        }
-        StaticBuffer::metainfo[bufferNum].timeStamp += 1;
         Disk::readBlock(StaticBuffer::blocks[bufferNum], this->blockNum);
     }
 
@@ -160,6 +165,7 @@ int BlockBuffer::loadBlockAndGetBufferPtr(unsigned char **bufferPtr)
 
     return SUCCESS;
 }
+
 int BlockBuffer::getHeader(struct HeadInfo *head)
 {
     unsigned char *bufferPtr;

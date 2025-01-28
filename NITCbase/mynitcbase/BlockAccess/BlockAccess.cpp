@@ -257,6 +257,7 @@ int BlockAccess::insert(int relId, Attribute* record) {
     }
 
     unsigned char* slotMap = (unsigned char*)malloc(sizeof(unsigned char) * relCatEntry.numSlotsPerBlk);
+    buffer.getSlotMap(slotMap);
     slotMap[rec_id.slot] = SLOT_OCCUPIED;
 
     buffer.setSlotMap(slotMap);
