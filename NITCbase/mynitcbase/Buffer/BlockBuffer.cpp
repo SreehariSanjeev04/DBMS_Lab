@@ -146,6 +146,10 @@ int RecBuffer::setSlotMap(unsigned char* slotMap) {
     memcpy(bufferPtr + HEADER_SIZE, slotMap, numSlots);
     ret = StaticBuffer::setDirtyBit(this->blockNum);
 
+    if(ret != SUCCESS) {
+        return ret;
+    }
+
     return SUCCESS;
 }
 
