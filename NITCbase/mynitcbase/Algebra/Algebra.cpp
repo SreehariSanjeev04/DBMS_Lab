@@ -190,6 +190,7 @@ int Algebra::select(char srcRel[ATTR_SIZE],char targetRel[ATTR_SIZE],char attr[A
     Attribute record[src_nAttrs];
 
     RelCacheTable::resetSearchIndex(srcRelId);
+    AttrCacheTable::resetSearchIndex(srcRelId, attr);
 
     while (BlockAccess::search(srcRelId, record, attr, attrVal, op) == SUCCESS)
     {
@@ -316,7 +317,7 @@ int Algebra::project(char srcRel[ATTR_SIZE], char targetRel[ATTR_SIZE], int tar_
 
         for (int i = 0; i < tar_nAttrs; i++)
         {
-            proj_record[i] = record[attr_offset[i]];
+            proj_record[i] = record[attr_offset[i]]; // copying the values at each attribute for the insertion
             ;
         }
 

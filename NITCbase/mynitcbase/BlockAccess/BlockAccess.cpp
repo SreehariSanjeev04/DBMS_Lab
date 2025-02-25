@@ -183,7 +183,6 @@ int BlockAccess::renameAttribute(char relName[ATTR_SIZE],char oldName[ATTR_SIZE]
     strcpy(relNameAttr.sVal, relName);
     char relcatAttrName[] = RELCAT_ATTR_RELNAME;
 
-    // Search for the relation with name relName in relation catalog
     RecId searchRes = linearSearch(RELCAT_RELID, relcatAttrName, relNameAttr, EQ);
     if (searchRes.slot == -1 && searchRes.block == -1)
     {
@@ -278,6 +277,7 @@ int BlockAccess::insert(int relId, Attribute *record)
         blockNum = header.rblock;
     }
 
+
     if (rec_id.slot == -1 && rec_id.block == -1)
     {
         if (relId == RELCAT_RELID)
@@ -352,7 +352,19 @@ int BlockAccess::search(int relId,Attribute *record,char attrName[ATTR_SIZE],Att
 {
 
     RecId recId;
-    recId = linearSearch(relId, attrName, attrVal, op);
+    AttrCatEntry attrCatEntry;
+    int ret = AttrCacheTable::getAttrCatEntry(relId, attrName, &attrCatEntry);
+    if(ret != SUCCESS) {
+        printf("Failed to fetch Attribute Cache Entry\n");
+        return ret;
+    }
+    
+    int rootBlock = attrCatEntry.rootBlock;
+    if(rootBlock==-1) {
+        recId = linearSearch(relId, attrName, attrVal, op);
+    } else {
+        recId = BPlusTree::bPlusSearch(relId, attrName, attrVal, op);
+    }
 
     if (recId.slot == -1 && recId.block == -1)
         return E_NOTFOUND;
