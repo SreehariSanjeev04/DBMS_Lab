@@ -236,6 +236,17 @@ int OpenRelTable::closeRel(int relId) {
 
     }
 
+    AttrCacheEntry* current = AttrCacheTable::attrCache[relId];
+    while(current) {
+        if(current->dirty == true) {
+            AttrCatEntry attrCatEntry = current->attrCatEntry;  
+            Attribute record[ATTRCAT_NO_ATTRS];
+            AttrCacheTable::attrCatEntryToRecord(&attrCatEntry, record);
+            RecBuffer attrCatBlock(current->recId.block);
+            attrCatBlock.setRecord(record, current->recId.slot);
+        }
+    }
+
     // releasing the relation cache entry of the relation
     free(RelCacheTable::relCache[relId]);
     freeLinkedList(&AttrCacheTable::attrCache[relId]);

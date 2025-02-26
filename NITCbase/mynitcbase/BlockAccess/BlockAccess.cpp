@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+int BlockAccess::numOfComparisons = 0;
+
 RecId BlockAccess::linearSearch(int relId,char attrName[ATTR_SIZE],union Attribute attrVal,int op)
 {
 
@@ -80,6 +82,7 @@ RecId BlockAccess::linearSearch(int relId,char attrName[ATTR_SIZE],union Attribu
 
         Attribute currRecordAttr = searchRecord[attrCatBuf.offset];
         int cmpVal = compareAttrs(currRecordAttr, attrVal, attrCatBuf.attrType);
+        BlockAccess::numOfComparisons++;
 
         if (
             (op == NE && cmpVal != 0) || 

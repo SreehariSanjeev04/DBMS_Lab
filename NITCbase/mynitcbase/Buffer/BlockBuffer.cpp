@@ -85,6 +85,44 @@ int IndInternal::getEntry(void *ptr, int indexNum) {
 }
 
 int IndLeaf::setEntry(void *ptr, int indexNum) {
+    if(indexNum < 0 || indexNum >= MAX_KEYS_LEAF) {
+        return E_OUTOFBOUND;
+    }
+    unsigned char *bufferPtr;   
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if(ret != SUCCESS) {
+        printf("Could not load the block\n");
+        return ret;
+    }
+    
+    struct Index *index = (struct Index*)ptr;
+    
+    unsigned char* entryPtr = bufferPtr + HEADER_SIZE + (LEAF_ENTRY_SIZE * indexNum);
+    memcpy(entryPtr, index, LEAF_ENTRY_SIZE);
+    return SUCCESS;
+}
+
+int IndInternal::setEntry(void *ptr, int indexNum) {
+    if(indexNum < 0 || indexNum >= MAX_KEYS_INTERNAL) {
+        return E_OUTOFBOUND;
+    }
+    unsigned char *bufferPtr;
+    int ret = loadBlockAndGetBufferPtr(&bufferPtr);
+    if(ret != SUCCESS) {
+        printf("Could not load the block\n");
+        return ret;
+    }
+
+    struct InternalEntry *internalEntry = (struct InternalEntry*)ptr;
+    unsigned char *entryPtr = bufferPtr + HEADER_SIZE + (indexNum * 20);
+
+    memcpy(entryPtr, &(internalEntry->lChild), sizeof(int32_t));
+    memcpy(entryPtr + 4, &(internalEntry->attrVal), sizeof(Attribute));
+    memcpy(entryPtr + 20, &(internalEntry->rChild), sizeof(int32_t));
+    return SUCCESS; 
+}
+
+int IndLeaf::setEntry(void *ptr, int indexNum) {
     return 0;
 }
 int IndInternal::setEntry(void *ptr, int indexNum) {
