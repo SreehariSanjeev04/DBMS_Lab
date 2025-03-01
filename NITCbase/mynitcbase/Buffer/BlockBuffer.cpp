@@ -61,7 +61,7 @@ int IndLeaf::getEntry(void *ptr, int indexNum) {
 }
 
 
-// what ?
+// To get the Internal Block Entry
 int IndInternal::getEntry(void *ptr, int indexNum) {
     if(indexNum < 0 || indexNum >= MAX_KEYS_INTERNAL) {
         return E_OUTOFBOUND;
@@ -122,12 +122,6 @@ int IndInternal::setEntry(void *ptr, int indexNum) {
     return SUCCESS; 
 }
 
-int IndLeaf::setEntry(void *ptr, int indexNum) {
-    return 0;
-}
-int IndInternal::setEntry(void *ptr, int indexNum) {
-    return 0;
-}
 
 RecBuffer::RecBuffer(int blockNum) : BlockBuffer::BlockBuffer(blockNum) {}
 
