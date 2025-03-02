@@ -72,22 +72,20 @@ RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attr
         }
         else
         {
-            index = 0;
-            bool found = false;
-            while (index < intHead.numEntries)
+            int entryIndex = 0;
+            while (entryIndex < intHead.numEntries)
             {
-                ret = internalBlock.getEntry(&intEntry, index);
-                int cmpVal = compareAttrs(intEntry.attrVal, attrVal, NUMBER);
+                ret = internalBlock.getEntry(&intEntry, entryIndex);
+                int cmpVal = compareAttrs(intEntry.attrVal, attrVal, attrCatEntry.attrType);
                 BPlusTree::numOfComparions++;
                 if ((op == EQ && cmpVal == 0) || (op == GE && cmpVal >= 0) || (op == GT && cmpVal > 0))
                 {
-                    found = true;
                     break;
                 }
-                index++;
+                entryIndex++;
             }
 
-            if (found)
+            if (entryIndex < intHead.numEntries)
             {
                 block = intEntry.lChild;
             }
@@ -100,6 +98,7 @@ RecId BPlusTree::bPlusSearch(int relId, char attrName[ATTR_SIZE], Attribute attr
     // now in the leaf index block, find the first leaf index entry that satisfies our condition
     while (block != -1)
     {
+        printf("%d\n", block);
         IndLeaf leafBlk(block);
         HeadInfo leafHead;
         leafBlk.getHeader(&leafHead);

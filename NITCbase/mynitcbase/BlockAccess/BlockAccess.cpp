@@ -245,7 +245,7 @@ int BlockAccess::insert(int relId, Attribute *record)
 
     RelCatEntry relCatEntry;
     int ret = RelCacheTable::getRelCatEntry(relId, &relCatEntry);
-    int blockNum = relCatEntry.firstBlk;
+    int blockNum = relCatEntry.lastBlk;
 
     RecId rec_id = {-1, -1};
 
