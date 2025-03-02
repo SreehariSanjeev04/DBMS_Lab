@@ -76,6 +76,7 @@ int AttrCacheTable::setAttrCatEntry(int relId, char attrName[ATTR_SIZE], AttrCat
             attrCacheHead->dirty = true;
             return SUCCESS;
         }
+        attrCacheHead = attrCacheHead->next;
     }
     return E_ATTRNOTEXIST;
 }
@@ -93,6 +94,8 @@ int AttrCacheTable::setAttrCatEntry(int relId, int attrOffset, AttrCatEntry* att
             attrCacheHead->dirty = true;
             return SUCCESS;
         }
+        attrCacheHead = attrCacheHead->next;
+        
     }
     return E_ATTRNOTEXIST;
 }

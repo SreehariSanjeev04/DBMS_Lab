@@ -245,6 +245,7 @@ int OpenRelTable::closeRel(int relId) {
             RecBuffer attrCatBlock(current->recId.block);
             attrCatBlock.setRecord(record, current->recId.slot);
         }
+        current = current->next;
     }
 
     // releasing the relation cache entry of the relation

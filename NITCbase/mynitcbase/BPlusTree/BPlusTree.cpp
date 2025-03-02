@@ -183,6 +183,9 @@ int BPlusTree::createNewRoot(int relId, char attrName[ATTR_SIZE], Attribute attr
     BlockBuffer leftChildBlock(lChild);
     BlockBuffer rightChildBlock(rChild);
 
+    leftChildBlock.getHeader(&leftChildHeader);
+    rightChildBlock.getHeader(&rightChildHeader);
+
     leftChildHeader.pblock = newRootBlockNum;
     rightChildHeader.pblock = newRootBlockNum;
 
@@ -264,6 +267,10 @@ int BPlusTree::insertIntoLeaf(int relId, char attrName[ATTR_SIZE], int leafBlock
     leafBlock.getHeader(&blockHeader);
 
     // existing indices + new index to insert
+
+    /*
+        Seg Fault
+    */
     Index indices[blockHeader.numEntries + 1];
 
     bool inserted = false;
@@ -557,6 +564,7 @@ int BPlusTree::bPlusCreate(int relId, char attrName[ATTR_SIZE])
     // Traverse all the blocks in the relation and insert them one by one into B+ tree
     while (block != -1)
     {
+        printf("%d\n", block);
         RecBuffer recBuf(block);
 
         unsigned char slotMap[relCatEntry.numSlotsPerBlk];
@@ -578,6 +586,7 @@ int BPlusTree::bPlusCreate(int relId, char attrName[ATTR_SIZE])
         recBuf.getHeader(&head);
         block = head.rblock;
     }
+    printf("Done\n");
     return SUCCESS;
 }
 
