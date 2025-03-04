@@ -1,0 +1,26 @@
+echo ---DROPPING---
+DROP TABLE Events
+DROP TABLE Locations
+DROP TABLE Participants
+DROP TABLE AudiPeople
+DROP TABLE AudiPeopleTemp
+echo ---CREATE---
+CREATE TABLE Events(id NUM, title STR, location STR)
+CREATE TABLE Locations(name STR, capacity NUM)
+CREATE TABLE Participants(regNo NUM, event STR)
+echo ---INSERTION---
+OPEN TABLE Events
+OPEN TABLE Locations
+OPEN TABLE Participants
+INSERT INTO Events VALUES FROM events.csv
+INSERT INTO Locations VALUES FROM locations.csv
+INSERT INTO Participants VALUES FROM s12participants.csv
+echo ---JOINING---
+echo ---AUDIPEOPLE---
+SELECT * FROM Events JOIN Locations INTO EventLocations WHERE Events.location=Locations.name
+SELECT * FROM Events JOIN Participants INTO AudiPeopleTemp WHERE Events.title=Participants.event
+OPEN TABLE AudiPeopleTemp
+SELECT regNo FROM AudiPeopleTemp INTO AudiPeople WHERE location=Audi
+CLOSE TABLE AudiPeopleTemp
+DROP TABLE AudiPeopleTemp
+echo DONE

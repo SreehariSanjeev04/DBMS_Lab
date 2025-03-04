@@ -147,8 +147,8 @@ int Schema::createIndex(char relName[ATTR_SIZE], char attrName[ATTR_SIZE]) {
         return E_NOTPERMITTED;
     }
     int relId = OpenRelTable::getRelId(relName);
-    if(relId == E_RELNOTOPEN) {
-        return E_RELNOTOPEN;
+    if(relId < 0) {
+        return relId;
     }
     return BPlusTree::bPlusCreate(relId, attrName);
 }
@@ -158,8 +158,8 @@ int Schema::dropIndex(char *relName, char *attrName) {
         return E_NOTPERMITTED;
     }
     int relId = OpenRelTable::getRelId(relName);
-    if(relId == E_RELNOTOPEN) {
-        return E_RELNOTOPEN;
+    if(relId < 0) {
+        return relId;
     }
     AttrCatEntry attrCatEntry;
     int ret = AttrCacheTable::getAttrCatEntry(relId, attrName, &attrCatEntry);
