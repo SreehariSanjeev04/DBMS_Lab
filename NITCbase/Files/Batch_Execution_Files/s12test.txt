@@ -1,10 +1,3 @@
-echo ---DROPPING---
-DROP TABLE Events
-DROP TABLE Locations
-DROP TABLE Participants
-DROP TABLE AudiPeople
-DROP TABLE AudiPeopleTemp
-echo ---CREATE---
 CREATE TABLE Events(id NUM, title STR, location STR)
 CREATE TABLE Locations(name STR, capacity NUM)
 CREATE TABLE Participants(regNo NUM, event STR)
@@ -21,6 +14,20 @@ SELECT * FROM Events JOIN Locations INTO EventLocations WHERE Events.location=Lo
 SELECT * FROM Events JOIN Participants INTO AudiPeopleTemp WHERE Events.title=Participants.event
 OPEN TABLE AudiPeopleTemp
 SELECT regNo FROM AudiPeopleTemp INTO AudiPeople WHERE location=Audi
+echo ---MINIEVENTPEOPLE---
+SELECT * FROM Locations INTO LocTemp100 WHERE capacity>100
+OPEN TABLE LocTemp100
+SELECT * FROM LocTemp100 INTO LocTemp200 WHERE capacity<200
+OPEN TABLE LocTemp200
+SELECT * FROM LocTemp200 JOIN Events INTO LocEventTemp WHERE LocTemp200.name=Events.location
+OPEN TABLE LocEventTemp
+SELECT regNo, title FROM LocEventTemp JOIN Participants INTO MiniEventPeople WHERE LocEventTemp.title=Participants.event
 CLOSE TABLE AudiPeopleTemp
+CLOSE TABLE LocEventTemp
+CLOSE TABLE LocTemp100
+CLOSE TABLE LocTemp200
 DROP TABLE AudiPeopleTemp
+DROP TABLE LocTemp100
+DROP TABLE LocTemp200
+DROP TABLE LocEventTemp
 echo DONE
