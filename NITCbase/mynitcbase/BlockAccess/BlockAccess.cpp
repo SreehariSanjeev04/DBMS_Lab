@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+int BlockAccess::numOfComparisons = 0;
+
 RecId BlockAccess::linearSearch(int relId,char attrName[ATTR_SIZE],union Attribute attrVal,int op)
 {
 
@@ -89,6 +91,7 @@ RecId BlockAccess::linearSearch(int relId,char attrName[ATTR_SIZE],union Attribu
             (op == GT && cmpVal > 0) ||
             (op == GE && cmpVal >= 0))
         {
+            numOfComparisons++;
             RecId recordId = {block, slot};
             RelCacheTable::setSearchIndex(relId, &recordId);
             return recordId;
