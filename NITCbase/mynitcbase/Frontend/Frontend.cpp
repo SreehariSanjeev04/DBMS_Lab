@@ -94,67 +94,37 @@ int Frontend::select_attrlist_from_table_where(
   ret = Algebra::project((char *)TEMP, relname_target, attr_count, attr_list);
 
   OpenRelTable::closeRel(tempRelId);
-  ret = Schema::deleteRel((char *)TEMP);
+  Schema::deleteRel((char *)TEMP);
   return ret;
 }
 
-int Frontend::select_from_join_where(
-    char relname_source_one[ATTR_SIZE],
-    char relname_source_two[ATTR_SIZE],
-    char relname_target[ATTR_SIZE],
-    char join_attr_one[ATTR_SIZE],
-    char join_attr_two[ATTR_SIZE])
+int Frontend::select_from_join_where(char relname_source_one[ATTR_SIZE], char relname_source_two[ATTR_SIZE],
+                                     char relname_target[ATTR_SIZE],
+                                     char join_attr_one[ATTR_SIZE], char join_attr_two[ATTR_SIZE])
 {
-
-  return Algebra::join(relname_source_one,
-                       relname_source_two,
-                       relname_target,
-                       join_attr_one,
-                       join_attr_two);
+  return Algebra::join(relname_source_one, relname_source_two, relname_target, join_attr_one, join_attr_two);
 }
 
-int Frontend::select_attrlist_from_join_where(
-    char relname_source_one[ATTR_SIZE],
-    char relname_source_two[ATTR_SIZE],
-    char relname_target[ATTR_SIZE],
-    char join_attr_one[ATTR_SIZE],
-    char join_attr_two[ATTR_SIZE],
-    int attr_count,
-    char attr_list[][ATTR_SIZE])
+int Frontend::select_attrlist_from_join_where(char relname_source_one[ATTR_SIZE], char relname_source_two[ATTR_SIZE],
+                                              char relname_target[ATTR_SIZE],
+                                              char join_attr_one[ATTR_SIZE], char join_attr_two[ATTR_SIZE],
+                                              int attr_count, char attr_list[][ATTR_SIZE])
 {
-
-  // TEMP results from the join of the two source relation (and hence it
-  // contains all attributes of the source relations except the join attribute
-  // of the second source relation)
-  int ret = Algebra::join(relname_source_one,
-                          relname_source_two,
-                          (char *)TEMP,
-                          join_attr_one,
-                          join_attr_two);
-
-  if (ret != SUCCESS)
-    return ret;
-
-  int relId = OpenRelTable::openRel((char *)TEMP);
-  if (relId < 0)
-  {
-    Schema::deleteRel((char *)TEMP);
+  int ret = Algebra::join(relname_source_one, relname_source_two,(char*)TEMP, join_attr_one, join_attr_two);
+  if(ret < 0) {
     return ret;
   }
+  int tempRelId = OpenRelTable::openRel((char*)TEMP);
+  if(tempRelId < 0) {
+    Schema::deleteRel((char*)TEMP);
+    return tempRelId;
+  }
 
-  // (The final target relation contains only those attributes mentioned in attr_list)
-  ret = Algebra::project((char *)TEMP, relname_target, attr_count, attr_list);
-  if (ret != SUCCESS)
-    return ret;
+  ret = Algebra::project((char*)TEMP, relname_target, attr_count, attr_list);
+  OpenRelTable::closeRel(tempRelId);
+  Schema::deleteRel((char*)TEMP);
+  return ret;
 
-  ret = OpenRelTable::closeRel(relId);
-  if (ret != SUCCESS)
-    return ret;
-  ret = Schema::deleteRel((char *)TEMP);
-  if (ret != SUCCESS)
-    return ret;
-
-  return SUCCESS;
 }
 
 int Frontend::custom_function(int argc, char argv[][ATTR_SIZE])

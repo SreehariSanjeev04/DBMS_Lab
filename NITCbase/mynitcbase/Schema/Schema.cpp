@@ -79,6 +79,8 @@ int Schema::createRel(char relName[], int nAttrs, char attrs[][ATTR_SIZE], int a
     RelCacheTable::resetSearchIndex(RELCAT_RELID);
     targetRecId = BlockAccess::linearSearch(RELCAT_RELID, relnameAttrRelcat, relNameAsAttribute, EQ);
 
+    printf("Target -> %d", targetRecId.block);
+
     if (targetRecId.slot != -1 || targetRecId.block != -1)
         return E_RELEXIST;
 
